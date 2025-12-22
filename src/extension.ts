@@ -34,8 +34,6 @@ export function activate(context: vscode.ExtensionContext) {
     for (let [pattern, enabled] of Object.entries(readOnlyPatterns)) {
       if (!enabled) continue;
       if (documentMatchesGlob(activeDocument, pattern)) {
-        vscode.window.showInformationMessage("Making active editor read only");
-
         // TODO: keep track of seen editors and don't mark them read only every
         // time. That way, we can make an editor writable if we want.
         setReadOnly();
