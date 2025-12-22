@@ -14,10 +14,17 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
-    "commands": [
+    "configuration": [
       {
-        "command": "code-automatic-readonly.helloWorld",
-        "title": "Hello World"
+        "title": "Auto-readonly",
+        "properties": {
+          "autoReadOnly.files": {
+            "type": "object",
+            "default": {},
+            "markdownDescription": "Glob patterns of files to make readonly. To match an arbitrary file name like `*noedit*`, be sure to use a leading double star: `**/*noedit*`.",
+            "scope": "resource"
+          }
+        }
       }
     ]
   },
