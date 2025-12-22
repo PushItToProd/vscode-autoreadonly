@@ -3,10 +3,9 @@ import * as vscode from 'vscode';
 export function activate(context: vscode.ExtensionContext) {
 
   function getReadOnlyPatterns(uri: vscode.Uri): object | null {
-    let readOnlyPatterns = vscode.workspace.getConfiguration("", uri).get("autoReadOnly.files");
-    console.log("readOnlyPatterns:", readOnlyPatterns);
+    const readOnlyPatterns = vscode.workspace.getConfiguration("", uri).get("autoReadOnly.files");
     if (typeof readOnlyPatterns !== 'object') {
-      throw `invalid type for readOnlyPatterns: ${typeof readOnlyPatterns}`;
+      throw `invalid type for setting 'autoReadOnly.files': ${typeof readOnlyPatterns}`;
     }
     return readOnlyPatterns;
   }
