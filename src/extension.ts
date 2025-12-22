@@ -34,14 +34,15 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.executeCommand("workbench.action.files.setActiveEditorReadonlyInSession");
   }
 
-  // TODO: this isn't fired if the editor is active when the window is first
-  // opened.
   vscode.window.onDidChangeActiveTextEditor(editor => {
     activeEditor = editor;
     if (editor) {
       checkIfActiveEditorShouldBeReadOnly();
     }
   }, null, context.subscriptions);
+
+  // Make active editor read only on startup.
+  checkIfActiveEditorShouldBeReadOnly();
 }
 
 // This method is called when your extension is deactivated
