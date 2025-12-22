@@ -20,8 +20,16 @@
         "properties": {
           "autoReadOnly.files": {
             "type": "object",
-            "default": {},
-            "markdownDescription": "Glob patterns of files to make readonly. To match an arbitrary file name like `*noedit*`, be sure to use a leading double star: `**/*noedit*`.",
+            "default": {
+              "**/node_modules/*": true,
+              "**/venv/**": true,
+              "**/.venv/**": true,
+              "/home/linuxbrew/**": true,
+              "/opt/homebrew/**": true,
+              "/home/*/go/pkg/**": true,
+              "/Users/*/go/pkg/**": true
+            },
+            "markdownDescription": "Glob patterns of files to make read only when opened. To match an arbitrary file name like `*noedit*`, be sure to use a leading double star: `**/*noedit*`.",
             "scope": "resource"
           }
         }
