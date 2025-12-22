@@ -12,12 +12,13 @@ export function activate(context: vscode.ExtensionContext) {
     if (!activeEditor) return;
 
     const fileUri = activeEditor.document.uri;
-    console.log("active editor URI:", fileUri);
+    console.debug("active editor URI:", fileUri);
 
     const filePath = fileUri.fsPath;
 
     if (shouldBeReadOnly(filePath)) {
-      console.log("setting active editor to read only");
+      console.debug("setting active editor to read only");
+
       // TODO: keep track of seen editors and don't mark them read only every
       // time. That way, we can make an editor writable if we want.
       vscode.window.showInformationMessage("Making active editor read only");
