@@ -1,6 +1,6 @@
 {
   "name": "code-automatic-readonly",
-  "displayName": "code-automatic-readonly",
+  "displayName": "Auto-readonly",
   "description": "Automatically make editors read only when files match a pattern.",
   "version": "0.0.1",
   "engines": {
