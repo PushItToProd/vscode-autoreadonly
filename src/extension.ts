@@ -13,7 +13,7 @@ function revertFile() {
 function getReadOnlyPatterns(uri: vscode.Uri): object {
   const readOnlyPatterns = vscode.workspace.getConfiguration("", uri).get("autoReadOnly.files");
   if (typeof readOnlyPatterns !== 'object') {
-    throw `invalid type for setting 'autoReadOnly.files': ${typeof readOnlyPatterns}`;
+    throw new Error(`invalid type for setting 'autoReadOnly.files': ${typeof readOnlyPatterns}`);
   }
   return readOnlyPatterns ?? {};
 }
@@ -50,7 +50,9 @@ function checkIfActiveEditorShouldBeReadOnly(): boolean {
   }
 
   for (let [pattern, enabled] of Object.entries(readOnlyPatterns)) {
-    if (!enabled) continue;
+    if (!enabled) {
+      continue;
+    }
     const activeDocument = activeEditor.document;
     if (documentMatchesGlob(activeDocument, pattern)) {
       return true;
@@ -64,7 +66,9 @@ function checkIfActiveEditorShouldBeReadOnly(): boolean {
 // read only. Returns true if the editor should be read only, otherwise returns
 // false.
 function updateActiveEditorReadOnly(): boolean {
-  if (!checkIfActiveEditorShouldBeReadOnly()) return false;
+  if (!checkIfActiveEditorShouldBeReadOnly()) {
+    return false;
+  }
 
   // TODO: keep track of seen editors and don't mark them read only every
   // time. That way, we can make an editor writable if we want.
