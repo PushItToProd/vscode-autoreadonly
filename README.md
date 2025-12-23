@@ -1,71 +1,39 @@
-# code-automatic-readonly README
+# Auto-readonly for VS Code
 
-This is the README for your extension "code-automatic-readonly". After writing up a brief description, we recommend including the following sections.
+This extension automatically sets VS Code editors to read only when viewing files matching a set of patterns. This is accomplished using the built-in command "File: Set Active Editor Read-only in Session", leaving the underlying file and its permissions unchanged on disk.
+
+To temporarily override this for a particular file, you can use the commands "File: Reset Active Editor Read-only in Session" or "File: Set Active Editor Writeable in Session".
+
+## Motivation
+
+* I frequently look at the source code of libraries I'm using, but it's annoyingly easy to edit these by mistake (e.g. starting to type thinking a different editor is currently focused).
+* Similarly, when using a language like TypeScript or Go with `go:generate`, I've found it annoyingly easy to mistakenly edit a generated file.
+
+ I've never actually had either of these problems cause me any issues, but an unnoticed stray keystroke in the wrong file could be a serious pain.
+
+Ideally, I'd like library files and generated files to be marked readonly, but lots of tools don't do that, so this is my fallback option to avoid making silly mistakes.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+By default, this extension includes patterns for a few common paths that may contain library code: 
 
-For example if there is an image subfolder under your extension project workspace:
+* `node_modules` for JavaScript
+* `venv` and `.venv` for Python
+* `/home/linuxbrew` and `/opt/homebrew` for Homebrew
+* `/home/*/go/pkg` and  `/home/*/go/pkg` for Golang
 
-\!\[feature X\]\(images/feature-x.png\)
+You can add more using the setting `autoReadOnly.files`. This setting can be overriden on a workspace and folder level.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+Another use case is for generated code files. For example, if you're writing a project in pure TypeScript, you might add `**/*.js` to your workspace settings to avoid editing any JS files by mistake.
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+None.
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+* `autoReadOnly.files`: An object whose keys should be glob patterns matching files to mark as read only and with boolean values. Patterns will be ignored if their boolean value is not `true`.
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+* Currently, this runs every time the active editor changes, so if you manually set a document as writable, switch focus, and switch back, the editor will become readonly again. I have no need for this use case, so I don't think it's currently worth trying to fix.
