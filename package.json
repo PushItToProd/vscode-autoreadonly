@@ -48,9 +48,10 @@
     "pretest": "pnpm run compile && pnpm run lint",
     "lint": "eslint src",
     "test": "vscode-test",
-    "package": "pnpm exec vsce package",
-    "install": "code --install-extension code-auto-readonly-*.vsix",
-    "uninstall": "code --uninstall-extension PushItToProd.code-auto-readonly"
+    "package": "pnpm run vsix",
+    "vsix": "pnpm exec vsce package",
+    "vsix-install": "code --install-extension code-auto-readonly-*.vsix",
+    "vsix-uninstall": "code --uninstall-extension PushItToProd.code-auto-readonly"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",

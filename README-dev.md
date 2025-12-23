@@ -2,6 +2,6 @@
 
 ## `pnpm` targets
 
-- `pnpm package` - build a .vsix package
-- `pnpm install` - install the built .vsix package in VS Code
-- `pnpm run uninstall` - uninstall the extension from VS Code
+- `pnpm run vsix` - build a .vsix package
+- `pnpm run vsix-install` - install the built .vsix package in VS Code
+- `pnpm run vsix-uninstall` - uninstall the extension from VS Code
