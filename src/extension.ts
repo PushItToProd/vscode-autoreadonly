@@ -1,9 +1,11 @@
 import * as vscode from 'vscode';
 
+// Invoke the command "File: Set Active Editor Read-only in Session".
 function setReadOnly() {
   vscode.commands.executeCommand("workbench.action.files.setActiveEditorReadonlyInSession");
 }
 
+// Get the patterns to treat as read only.
 function getReadOnlyPatterns(uri: vscode.Uri): object | null {
   const readOnlyPatterns = vscode.workspace.getConfiguration("", uri).get("autoReadOnly.files");
   if (typeof readOnlyPatterns !== 'object') {
@@ -12,8 +14,16 @@ function getReadOnlyPatterns(uri: vscode.Uri): object | null {
   return readOnlyPatterns;
 }
 
-// via https://stackoverflow.com/a/73793753
+// Given a TextDocument and glob pattern as a string, check if the underlying
+// file matches the glob.
+//
+// Source - https://stackoverflow.com/a/73793753
+// Posted by Jack Punt. See post 'Timeline' for change history.
+// Retrieved 2025-12-22, License - CC BY-SA 4.0
 function documentMatchesGlob(doc: vscode.TextDocument, glob: string): boolean {
+  // This is pretty janky, but it appears to be the only way to access VS Code's
+  // glob implementation from an extension. I'd rather do this so glob behavior
+  // is (hopefully) consistent with built-in settings like `files.exclude`.
   return vscode.languages.match({ pattern: glob }, doc) !== 0;
 }
 
