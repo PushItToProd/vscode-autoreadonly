@@ -1,6 +1,7 @@
 {
   "name": "code-auto-readonly",
   "displayName": "Auto-Readonly",
+  "publisher": "PushItToProd",
   "description": "Automatically make editors read only when files match a pattern.",
   "repository": {
     "type": "git",
