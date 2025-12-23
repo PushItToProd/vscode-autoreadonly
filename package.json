@@ -2,6 +2,10 @@
   "name": "code-auto-readonly",
   "displayName": "Auto-Readonly",
   "description": "Automatically make editors read only when files match a pattern.",
+  "repository": {
+    "type": "git",
+    "url": "github:PushItToProd/vscode-autoreadonly"
+  },
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.107.0"
