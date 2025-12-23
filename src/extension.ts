@@ -27,45 +27,43 @@ function documentMatchesGlob(doc: vscode.TextDocument, glob: string): boolean {
   return vscode.languages.match({ pattern: glob }, doc) !== 0;
 }
 
-export function activate(context: vscode.ExtensionContext) {
-  // Keep track of the active editor.
-  let activeEditor = vscode.window.activeTextEditor;
+function checkIfActiveEditorShouldBeReadOnly(editor: vscode.TextEditor) {
+  if (!editor) return;
 
-  function checkIfActiveEditorShouldBeReadOnly() {
-    if (!activeEditor) return;
+  const activeDocument = editor.document;
+  const fileUri = editor.document.uri;
 
-    const activeDocument = activeEditor.document;
-    const fileUri = activeEditor.document.uri;
+  const readOnlyPatterns = getReadOnlyPatterns(fileUri);
+  if (!readOnlyPatterns) {
+    console.debug("no read only patterns configured");
+    return;
+  }
 
-    const readOnlyPatterns = getReadOnlyPatterns(fileUri);
-    if (!readOnlyPatterns) {
-      console.debug("no read only patterns configured");
+  for (let [pattern, enabled] of Object.entries(readOnlyPatterns)) {
+    if (!enabled) continue;
+    if (documentMatchesGlob(activeDocument, pattern)) {
+      // TODO: keep track of seen editors and don't mark them read only every
+      // time. That way, we can make an editor writable if we want.
+      setReadOnly();
       return;
     }
+  }
+};
 
-    for (let [pattern, enabled] of Object.entries(readOnlyPatterns)) {
-      if (!enabled) continue;
-      if (documentMatchesGlob(activeDocument, pattern)) {
-        // TODO: keep track of seen editors and don't mark them read only every
-        // time. That way, we can make an editor writable if we want.
-        setReadOnly();
-        return;
-      }
-    }
-  };
-
+export function activate(context: vscode.ExtensionContext) {
   // XXX: consider using vscode.workspace.onDidOpenTextDocument instead of
   // onDidChangeActiveTextEditor.
 
   vscode.window.onDidChangeActiveTextEditor(editor => {
-    activeEditor = editor;
     if (editor) {
-      checkIfActiveEditorShouldBeReadOnly();
+      checkIfActiveEditorShouldBeReadOnly(editor);
     }
   }, null, context.subscriptions);
 
   // Make active editor read only on startup.
-  checkIfActiveEditorShouldBeReadOnly();
+  if (vscode.window.activeTextEditor) {
+    checkIfActiveEditorShouldBeReadOnly(vscode.window.activeTextEditor);
+  }
 }
 
 export function deactivate() {}
