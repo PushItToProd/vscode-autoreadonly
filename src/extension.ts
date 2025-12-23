@@ -1,20 +1,23 @@
 import * as vscode from 'vscode';
 
+function setReadOnly() {
+  vscode.commands.executeCommand("workbench.action.files.setActiveEditorReadonlyInSession");
+}
+
+function getReadOnlyPatterns(uri: vscode.Uri): object | null {
+  const readOnlyPatterns = vscode.workspace.getConfiguration("", uri).get("autoReadOnly.files");
+  if (typeof readOnlyPatterns !== 'object') {
+    throw `invalid type for setting 'autoReadOnly.files': ${typeof readOnlyPatterns}`;
+  }
+  return readOnlyPatterns;
+}
+
+// via https://stackoverflow.com/a/73793753
+function documentMatchesGlob(doc: vscode.TextDocument, glob: string): boolean {
+  return vscode.languages.match({ pattern: glob }, doc) !== 0;
+}
+
 export function activate(context: vscode.ExtensionContext) {
-
-  function getReadOnlyPatterns(uri: vscode.Uri): object | null {
-    const readOnlyPatterns = vscode.workspace.getConfiguration("", uri).get("autoReadOnly.files");
-    if (typeof readOnlyPatterns !== 'object') {
-      throw `invalid type for setting 'autoReadOnly.files': ${typeof readOnlyPatterns}`;
-    }
-    return readOnlyPatterns;
-  }
-
-  // via https://stackoverflow.com/a/73793753
-  function documentMatchesGlob(doc: vscode.TextDocument, glob: string): boolean {
-    return vscode.languages.match({ pattern: glob }, doc) !== 0;
-  }
-
   // Keep track of the active editor.
   let activeEditor = vscode.window.activeTextEditor;
 
@@ -40,10 +43,6 @@ export function activate(context: vscode.ExtensionContext) {
       }
     }
   };
-
-  function setReadOnly() {
-    vscode.commands.executeCommand("workbench.action.files.setActiveEditorReadonlyInSession");
-  }
 
   // XXX: consider using vscode.workspace.onDidOpenTextDocument instead of
   // onDidChangeActiveTextEditor.
