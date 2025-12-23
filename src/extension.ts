@@ -5,13 +5,17 @@ function setReadOnly() {
   vscode.commands.executeCommand("workbench.action.files.setActiveEditorReadonlyInSession");
 }
 
+function revertFile() {
+  vscode.commands.executeCommand("workbench.action.files.revert");
+}
+
 // Get the patterns to treat as read only.
-function getReadOnlyPatterns(uri: vscode.Uri): object | null {
+function getReadOnlyPatterns(uri: vscode.Uri): object {
   const readOnlyPatterns = vscode.workspace.getConfiguration("", uri).get("autoReadOnly.files");
   if (typeof readOnlyPatterns !== 'object') {
     throw `invalid type for setting 'autoReadOnly.files': ${typeof readOnlyPatterns}`;
   }
-  return readOnlyPatterns;
+  return readOnlyPatterns ?? {};
 }
 
 // Given a TextDocument and glob pattern as a string, check if the underlying
@@ -27,28 +31,46 @@ function documentMatchesGlob(doc: vscode.TextDocument, glob: string): boolean {
   return vscode.languages.match({ pattern: glob }, doc) !== 0;
 }
 
-function checkIfActiveEditorShouldBeReadOnly(editor: vscode.TextEditor) {
-  if (!editor) return;
+// Check if the file open in the active editor should be marked as read only.
+function checkIfActiveEditorShouldBeReadOnly(): boolean {
+  // Instead of taking the active editor as a function parameter, we retrieve it
+  // here every time. There's no point in accepting an arbitrary editor since
+  // (as far as I can tell) we can only mark the active text editor as read only
+  // with VS Code's extension API.
+  const activeEditor = vscode.window.activeTextEditor;
+  if (!activeEditor) {
+    return false;
+  }
 
-  const activeDocument = editor.document;
-  const fileUri = editor.document.uri;
-
+  const fileUri = activeEditor.document.uri;
   const readOnlyPatterns = getReadOnlyPatterns(fileUri);
   if (!readOnlyPatterns) {
     console.debug("no read only patterns configured");
-    return;
+    return false;
   }
 
   for (let [pattern, enabled] of Object.entries(readOnlyPatterns)) {
     if (!enabled) continue;
+    const activeDocument = activeEditor.document;
     if (documentMatchesGlob(activeDocument, pattern)) {
-      // TODO: keep track of seen editors and don't mark them read only every
-      // time. That way, we can make an editor writable if we want.
-      setReadOnly();
-      return;
+      return true;
     }
   }
+
+  return false;
 };
+
+// Check if the active editor should be read only and, if it should, mark it as
+// read only. Returns true if the editor should be read only, otherwise returns
+// false.
+function updateActiveEditorReadOnly(): boolean {
+  if (!checkIfActiveEditorShouldBeReadOnly()) return false;
+
+  // TODO: keep track of seen editors and don't mark them read only every
+  // time. That way, we can make an editor writable if we want.
+  setReadOnly();
+  return true;
+}
 
 export function activate(context: vscode.ExtensionContext) {
   // XXX: consider using vscode.workspace.onDidOpenTextDocument instead of
@@ -56,13 +78,17 @@ export function activate(context: vscode.ExtensionContext) {
 
   vscode.window.onDidChangeActiveTextEditor(editor => {
     if (editor) {
-      checkIfActiveEditorShouldBeReadOnly(editor);
+      updateActiveEditorReadOnly();
     }
   }, null, context.subscriptions);
 
   // Make active editor read only on startup.
-  if (vscode.window.activeTextEditor) {
-    checkIfActiveEditorShouldBeReadOnly(vscode.window.activeTextEditor);
+  if (updateActiveEditorReadOnly()) {
+    // Undo any changes that may have inadvertently happened before the
+    // extension loaded. Otherwise, there's a brief period of time where it may
+    // be possible to edit the file in the active editor before it's made read
+    // only.
+    revertFile();
   }
 }
 
