@@ -1,4 +1,4 @@
-# Auto-readonly for VS Code
+# Auto-Readonly for VS Code
 
 This extension automatically sets VS Code editors to read only when viewing files matching a set of patterns. This is accomplished using the built-in command "File: Set Active Editor Read-only in Session", leaving the underlying file and its permissions unchanged on disk.
 
