@@ -24,11 +24,22 @@ function getReadOnlyPatterns(uri: vscode.Uri): object {
 // Source - https://stackoverflow.com/a/73793753
 // Posted by Jack Punt. See post 'Timeline' for change history.
 // Retrieved 2025-12-22, License - CC BY-SA 4.0
-function documentMatchesGlob(doc: vscode.TextDocument, glob: string): boolean {
+export function documentMatchesGlob(doc: vscode.TextDocument, glob: string): boolean {
   // This is pretty janky, but it appears to be the only way to access VS Code's
   // glob implementation from an extension. I'd rather do this so glob behavior
   // is (hopefully) consistent with built-in settings like `files.exclude`.
   return vscode.languages.match({ pattern: glob }, doc) !== 0;
+}
+
+export function documentMatchesMultiGlob(doc: vscode.TextDocument, globs: Record<string, boolean>): boolean {
+  let matchedGlob = false;
+  for (let [pattern, enabled] of Object.entries(globs)) {
+    if (documentMatchesGlob(doc, pattern)) {
+      matchedGlob = enabled;
+    }
+  }
+
+  return matchedGlob;
 }
 
 // Check if the file open in the active editor should be marked as read only.
@@ -49,17 +60,8 @@ function checkIfActiveEditorShouldBeReadOnly(): boolean {
     return false;
   }
 
-  for (let [pattern, enabled] of Object.entries(readOnlyPatterns)) {
-    if (!enabled) {
-      continue;
-    }
-    const activeDocument = activeEditor.document;
-    if (documentMatchesGlob(activeDocument, pattern)) {
-      return true;
-    }
-  }
-
-  return false;
+  const activeDocument = activeEditor.document;
+  return documentMatchesMultiGlob(activeDocument, readOnlyPatterns as Record<string, boolean>);
 };
 
 // Check if the active editor should be read only and, if it should, mark it as
