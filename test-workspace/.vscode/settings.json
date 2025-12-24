@@ -1,0 +1,6 @@
+{
+  "autoReadOnly.files": {
+    "**/*noedit*": true,
+    "**/hola.noedit*": false
+  }
+}
