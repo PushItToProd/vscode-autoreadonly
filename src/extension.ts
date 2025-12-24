@@ -31,23 +31,33 @@ export function documentMatchesGlob(doc: vscode.TextDocument, glob: string): boo
   return vscode.languages.match({ pattern: glob }, doc) !== 0;
 }
 
-// documentMatchesGlobObject takes a TextDocument and an object of globs,
-// testing whether the document matches each glob one by one. It will return
-// the value of the last glob that matched the TextDocument.
-export function documentMatchesGlobObject(doc: vscode.TextDocument, globs: Record<string, boolean>): boolean {
-  let matchedGlob = false;
+// getGlobValueForDocument takes a TextDocument and an object whose keys are
+// globs. It tests whether each glob matches the document and returns the value
+// of the last glob that matched.
+export function getGlobValueForDocument<T>(doc: vscode.TextDocument, globs: Record<string, T>, defaultVal?: T): T | undefined {
+  let result: T | undefined = undefined;
 
   // As of ES2015 (https://stackoverflow.com/a/5525820), object string keys are
   // stored in chronological insertion order, so we can just iterate the list of
   // globs and assume that the user has ordered them from least to most
   // specific. (https://tc39.es/ecma262/#sec-ordinaryownpropertykeys)
-  for (let [pattern, enabled] of Object.entries(globs)) {
-    if (documentMatchesGlob(doc, pattern)) {
-      matchedGlob = enabled;
+  for (let [glob, val] of Object.entries(globs)) {
+    if (documentMatchesGlob(doc, glob)) {
+      result = val;
     }
   }
+  if (result === undefined && defaultVal !== undefined) {
+    result = defaultVal;
+  }
+  return result;
+}
 
-  return matchedGlob;
+// documentMatchesGlobObject takes a TextDocument and an object whose keys are
+// globs and whose values are booleans, testing whether the document matches
+// each glob one by one. It will return the value of the last glob that matched
+// the TextDocument.
+export function documentMatchesGlobObject(doc: vscode.TextDocument, globs: Record<string, boolean>): boolean {
+  return getGlobValueForDocument(doc, globs) ?? false;
 }
 
 // Check if the file open in the active editor should be marked as read only.
