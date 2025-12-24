@@ -31,8 +31,16 @@ export function documentMatchesGlob(doc: vscode.TextDocument, glob: string): boo
   return vscode.languages.match({ pattern: glob }, doc) !== 0;
 }
 
-export function documentMatchesMultiGlob(doc: vscode.TextDocument, globs: Record<string, boolean>): boolean {
+// documentMatchesGlobObject takes a TextDocument and an object of globs,
+// testing whether the document matches each glob one by one. It will return
+// the value of the last glob that matched the TextDocument.
+export function documentMatchesGlobObject(doc: vscode.TextDocument, globs: Record<string, boolean>): boolean {
   let matchedGlob = false;
+
+  // As of ES2015 (https://stackoverflow.com/a/5525820), object string keys are
+  // stored in chronological insertion order, so we can just iterate the list of
+  // globs and assume that the user has ordered them from least to most
+  // specific. (https://tc39.es/ecma262/#sec-ordinaryownpropertykeys)
   for (let [pattern, enabled] of Object.entries(globs)) {
     if (documentMatchesGlob(doc, pattern)) {
       matchedGlob = enabled;
@@ -61,7 +69,7 @@ function checkIfActiveEditorShouldBeReadOnly(): boolean {
   }
 
   const activeDocument = activeEditor.document;
-  return documentMatchesMultiGlob(activeDocument, readOnlyPatterns as Record<string, boolean>);
+  return documentMatchesGlobObject(activeDocument, readOnlyPatterns as Record<string, boolean>);
 };
 
 // Check if the active editor should be read only and, if it should, mark it as

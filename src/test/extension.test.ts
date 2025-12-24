@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as vscode from 'vscode';
-import { documentMatchesGlob, documentMatchesMultiGlob } from '../extension';
+import { documentMatchesGlob, documentMatchesGlobObject } from '../extension';
 
 suite('Extension Test Suite', () => {
     vscode.window.showInformationMessage('Start all tests.');
@@ -47,20 +47,20 @@ suite('Extension Test Suite', () => {
             fileName: 'file.js',
             languageId: 'javascript'
         } as unknown as vscode.TextDocument;
-        assert.strictEqual(documentMatchesMultiGlob(mockSrcFileDoc, globs), false);
+        assert.strictEqual(documentMatchesGlobObject(mockSrcFileDoc, globs), false);
 
         const mockNodeModulesFileDoc = {
             uri: vscode.Uri.file('/home/user/project/node_modules/some_package/file.js'),
             fileName: 'file.js',
             languageId: 'javascript'
         } as unknown as vscode.TextDocument;
-        assert.strictEqual(documentMatchesMultiGlob(mockNodeModulesFileDoc, globs), true);
+        assert.strictEqual(documentMatchesGlobObject(mockNodeModulesFileDoc, globs), true);
 
         const mockSpecialNodeModulesFileDoc = {
             uri: vscode.Uri.file('/home/user/project/node_modules/special/file.js'),
             fileName: 'file.js',
             languageId: 'javascript'
         } as unknown as vscode.TextDocument;
-        assert.strictEqual(documentMatchesMultiGlob(mockSpecialNodeModulesFileDoc, globs), false);
+        assert.strictEqual(documentMatchesGlobObject(mockSpecialNodeModulesFileDoc, globs), false);
     });
 });
