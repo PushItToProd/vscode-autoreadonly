@@ -2,29 +2,24 @@ import * as assert from 'assert';
 import * as vscode from 'vscode';
 import { documentMatchesGlob, documentMatchesGlobObject } from '../extension';
 
+// Create a mock TextDocument suitable for testing documentMatchesGlob().
+function mockTextDocument(path: string): vscode.TextDocument {
+  // Just specifying a uri is sufficient for vscode.languages.match() (which
+  // documentMatchesGlob() relies on) to check if it matches the glob.
+  return {uri: vscode.Uri.file(path)} as vscode.TextDocument;
+}
+
 suite('Extension Test Suite', () => {
     vscode.window.showInformationMessage('Start all tests.');
 
     test('documentMatchesGlob matches patterns correctly', () => {
-        const mockMdDoc = {
-            uri: vscode.Uri.file('/path/to/file.md'),
-            fileName: 'file.md',
-            languageId: 'markdown'
-        } as unknown as vscode.TextDocument;
+        const mockMdDoc = mockTextDocument('/path/to/file.md');
 
         assert.strictEqual(documentMatchesGlob(mockMdDoc, '**/*.md'), true);
         assert.strictEqual(documentMatchesGlob(mockMdDoc, '**/*.ts'), false);
 
-        const mockNodeModulesDoc = {
-            uri: vscode.Uri.file('/home/user/my_project/node_modules/file.js'),
-            fileName: 'file.js',
-            languageId: 'javascript'
-        } as unknown as vscode.TextDocument;
-        const mockSrcDoc = {
-            uri: vscode.Uri.file('/home/user/my_project/src/file.js'),
-            fileName: 'file.js',
-            languageId: 'javascript'
-        } as unknown as vscode.TextDocument;
+        const mockNodeModulesDoc = mockTextDocument('/home/user/my_project/node_modules/file.js');
+        const mockSrcDoc = mockTextDocument('/home/user/my_project/src/file.js');
         const nodeModulesGlob = '**/node_modules/**';
         const srcGlob = '**/src/**';
 
@@ -42,25 +37,13 @@ suite('Extension Test Suite', () => {
             '**/src/out/**': true,
         };
 
-        const mockSrcFileDoc = {
-            uri: vscode.Uri.file('/home/user/project/src/file.js'),
-            fileName: 'file.js',
-            languageId: 'javascript'
-        } as unknown as vscode.TextDocument;
+        const mockSrcFileDoc = mockTextDocument('/home/user/project/src/file.js');
         assert.strictEqual(documentMatchesGlobObject(mockSrcFileDoc, globs), false);
 
-        const mockNodeModulesFileDoc = {
-            uri: vscode.Uri.file('/home/user/project/node_modules/some_package/file.js'),
-            fileName: 'file.js',
-            languageId: 'javascript'
-        } as unknown as vscode.TextDocument;
+        const mockNodeModulesFileDoc = mockTextDocument('/home/user/project/node_modules/some_package/file.js');
         assert.strictEqual(documentMatchesGlobObject(mockNodeModulesFileDoc, globs), true);
 
-        const mockSpecialNodeModulesFileDoc = {
-            uri: vscode.Uri.file('/home/user/project/node_modules/special/file.js'),
-            fileName: 'file.js',
-            languageId: 'javascript'
-        } as unknown as vscode.TextDocument;
+        const mockSpecialNodeModulesFileDoc = mockTextDocument('/home/user/project/node_modules/special/file.js');
         assert.strictEqual(documentMatchesGlobObject(mockSpecialNodeModulesFileDoc, globs), false);
     });
 });
