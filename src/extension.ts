@@ -5,11 +5,12 @@ function setReadOnly() {
   vscode.commands.executeCommand("workbench.action.files.setActiveEditorReadonlyInSession");
 }
 
+// Invoke the command "File: Revert File".
 function revertFile() {
   vscode.commands.executeCommand("workbench.action.files.revert");
 }
 
-// Get the patterns to treat as read only.
+// Get the patterns to treat as read only from the relevant config.
 function getReadOnlyPatterns(uri: vscode.Uri): object {
   const readOnlyPatterns = vscode.workspace.getConfiguration("", uri).get("autoReadOnly.files");
   if (typeof readOnlyPatterns !== 'object') {
