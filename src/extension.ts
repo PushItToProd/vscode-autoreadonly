@@ -34,7 +34,9 @@ export function documentMatchesGlob(doc: vscode.TextDocument, glob: string): boo
 // getGlobValueForDocument takes a TextDocument and an object whose keys are
 // globs. It tests whether each glob matches the document and returns the value
 // of the last glob that matched.
-export function getGlobValueForDocument<T>(doc: vscode.TextDocument, globs: Record<string, T>, defaultVal?: T): T | undefined {
+function getGlobValueForDocument<T>(doc: vscode.TextDocument, globs: Record<string, T>): T | undefined
+function getGlobValueForDocument<T, D = T>(doc: vscode.TextDocument, globs: Record<string, T>, defaultVal: D): T | D
+function getGlobValueForDocument<T>(doc: vscode.TextDocument, globs: Record<string, T>, defaultVal?: T): T | undefined {
   let result: T | undefined = undefined;
 
   // As of ES2015 (https://stackoverflow.com/a/5525820), object string keys are
@@ -57,7 +59,7 @@ export function getGlobValueForDocument<T>(doc: vscode.TextDocument, globs: Reco
 // each glob one by one. It will return the value of the last glob that matched
 // the TextDocument.
 export function documentMatchesGlobObject(doc: vscode.TextDocument, globs: Record<string, boolean>): boolean {
-  return getGlobValueForDocument(doc, globs) ?? false;
+  return getGlobValueForDocument(doc, globs, false);
 }
 
 // Check if the file open in the active editor should be marked as read only.
