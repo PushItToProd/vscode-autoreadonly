@@ -10,40 +10,40 @@ function mockTextDocument(path: string): vscode.TextDocument {
 }
 
 suite('Extension Test Suite', () => {
-    vscode.window.showInformationMessage('Start all tests.');
+  vscode.window.showInformationMessage('Start all tests.');
 
-    test('documentMatchesGlob matches patterns correctly', () => {
-        const mockMdDoc = mockTextDocument('/path/to/file.md');
+  test('documentMatchesGlob matches patterns correctly', () => {
+    const mockMdDoc = mockTextDocument('/path/to/file.md');
 
-        assert.strictEqual(documentMatchesGlob(mockMdDoc, '**/*.md'), true);
-        assert.strictEqual(documentMatchesGlob(mockMdDoc, '**/*.ts'), false);
+    assert.strictEqual(documentMatchesGlob(mockMdDoc, '**/*.md'), true);
+    assert.strictEqual(documentMatchesGlob(mockMdDoc, '**/*.ts'), false);
 
-        const mockNodeModulesDoc = mockTextDocument('/home/user/my_project/node_modules/file.js');
-        const mockSrcDoc = mockTextDocument('/home/user/my_project/src/file.js');
-        const nodeModulesGlob = '**/node_modules/**';
-        const srcGlob = '**/src/**';
+    const mockNodeModulesDoc = mockTextDocument('/home/user/my_project/node_modules/file.js');
+    const mockSrcDoc = mockTextDocument('/home/user/my_project/src/file.js');
+    const nodeModulesGlob = '**/node_modules/**';
+    const srcGlob = '**/src/**';
 
-        assert.strictEqual(documentMatchesGlob(mockNodeModulesDoc, nodeModulesGlob), true);
-        assert.strictEqual(documentMatchesGlob(mockSrcDoc, nodeModulesGlob), false);
-        assert.strictEqual(documentMatchesGlob(mockNodeModulesDoc, srcGlob), false);
-        assert.strictEqual(documentMatchesGlob(mockSrcDoc, srcGlob), true);
-    });
+    assert.strictEqual(documentMatchesGlob(mockNodeModulesDoc, nodeModulesGlob), true);
+    assert.strictEqual(documentMatchesGlob(mockSrcDoc, nodeModulesGlob), false);
+    assert.strictEqual(documentMatchesGlob(mockNodeModulesDoc, srcGlob), false);
+    assert.strictEqual(documentMatchesGlob(mockSrcDoc, srcGlob), true);
+  });
 
-    test('documentMatchesMultiGlob matches multiple patterns correctly', () => {
-        const globs = {
-            '**/node_modules/**': true,
-            '**/node_modules/special/**': false,
-            '**/src/**': false,
-            '**/src/out/**': true,
-        };
+  test('documentMatchesMultiGlob matches multiple patterns correctly', () => {
+    const globs = {
+      '**/node_modules/**': true,
+      '**/node_modules/special/**': false,
+      '**/src/**': false,
+      '**/src/out/**': true,
+    };
 
-        const mockSrcFileDoc = mockTextDocument('/home/user/project/src/file.js');
-        assert.strictEqual(documentMatchesGlobObject(mockSrcFileDoc, globs), false);
+    const mockSrcFileDoc = mockTextDocument('/home/user/project/src/file.js');
+    assert.strictEqual(documentMatchesGlobObject(mockSrcFileDoc, globs), false);
 
-        const mockNodeModulesFileDoc = mockTextDocument('/home/user/project/node_modules/some_package/file.js');
-        assert.strictEqual(documentMatchesGlobObject(mockNodeModulesFileDoc, globs), true);
+    const mockNodeModulesFileDoc = mockTextDocument('/home/user/project/node_modules/some_package/file.js');
+    assert.strictEqual(documentMatchesGlobObject(mockNodeModulesFileDoc, globs), true);
 
-        const mockSpecialNodeModulesFileDoc = mockTextDocument('/home/user/project/node_modules/special/file.js');
-        assert.strictEqual(documentMatchesGlobObject(mockSpecialNodeModulesFileDoc, globs), false);
-    });
+    const mockSpecialNodeModulesFileDoc = mockTextDocument('/home/user/project/node_modules/special/file.js');
+    assert.strictEqual(documentMatchesGlobObject(mockSpecialNodeModulesFileDoc, globs), false);
+  });
 });
